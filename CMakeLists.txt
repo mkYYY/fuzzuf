@@ -332,6 +332,7 @@ set(
   exec_input/on_disk_exec_input.cpp
   exec_input/on_memory_exec_input.cpp
   executor/executor.cpp
+  executor/frida_linux_executor.cpp
   executor/linux_fork_server_executor.cpp
   executor/native_linux_executor.cpp
   executor/pintool_executor.cpp
