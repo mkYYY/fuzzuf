@@ -30,6 +30,7 @@
 #include "fuzzuf/algorithms/afl/afl_option.hpp"
 #include "fuzzuf/exceptions.hpp"
 #include "fuzzuf/executor/executor.hpp"
+#include "fuzzuf/executor/linux_fork_server_executor.hpp"
 #include "fuzzuf/executor/native_linux_executor.hpp"
 #include "fuzzuf/utils/workspace.hpp"
 #include "fuzzuf/utils/common.hpp"
@@ -61,18 +62,20 @@
  *       * NOTE: Executor does not take care about binding a CPU core. The owner fuzzing algorithm is responsible to it.
  */
 FridaLinuxExecutor::FridaLinuxExecutor(
-    const std::vector<std::string>& argv,
-    u32 exec_timelimit_ms,
-    u64 exec_memlimit,
-    bool forksrv,
-    const fs::path& path_to_write_input,
-    u32 afl_shm_size,
-    u32 bb_shm_size,
-    bool record_stdout_and_err
-) : NativeLinuxExecutor(
+        const std::vector<std::string> &argv,
+        u32 exec_timelimit_ms,
+        u64 exec_memlimit,
+        const fs::path &path_to_write_input,
+        u32 afl_shm_size,
+        u32  bb_shm_size,
+        const fs::path &proxy_path,
+        bool record_stdout_and_err,
+        std::vector< std::string > &&environment_variables_
+) 
+    : LinuxForkServerExecutor(
         argv, exec_timelimit_ms, exec_memlimit,
-        forksrv ? deferred : static_cast<tribool>(false),
-        path_to_write_input, afl_shm_size, bb_shm_size, record_stdout_and_err)
+        path_to_write_input, afl_shm_size, bb_shm_size,
+        record_stdout_and_err, {}, true)
 {
     struct stat statbuf;
     if ((stat(FUZZUF_AFL_FRIDA_TRACE_SO, &statbuf)) == -1) {
@@ -81,26 +84,17 @@ FridaLinuxExecutor::FridaLinuxExecutor(
     setenv("LD_PRELOAD", FUZZUF_AFL_FRIDA_TRACE_SO, 1);
     // Need to add the size of the library
     this->exec_memlimit += (statbuf.st_size >> 20);
+    LinuxForkServerExecutor::CreateJoinedEnvironmentVariables( std::move(environment_variables_) );
 
-    MSG(cCYA "before: %s\n" cRST, getenv("__AFL_DEFER_FORKSRV"));
-    setenv("__AFL_DEFER_FORKSRV", "1", 1);
-    MSG(cCYA "after : %s\n" cRST, getenv("__AFL_DEFER_FORKSRV"));
-    if (forksrv) {
-        // Finally start the fork-server setup
-        NativeLinuxExecutor::SetupForkServer();
-    }
+    put_channel.SetupForkServer(const_cast<char * const *>(cargv.data()));
 }
 
-FridaLinuxExecutor::~FridaLinuxExecutor()
-{
-    NativeLinuxExecutor::~NativeLinuxExecutor();
-}
+FridaLinuxExecutor::~FridaLinuxExecutor() {}
 void FridaLinuxExecutor::Run(const u8 *buf, u32 len, u32 timeout_ms)
 {
-    NativeLinuxExecutor::Run(buf, len, timeout_ms);
+    LinuxForkServerExecutor::Run(buf, len, timeout_ms);
 }
 void FridaLinuxExecutor::ReceiveStopSignal(void)
 {
-    NativeLinuxExecutor::ReceiveStopSignal();
+    LinuxForkServerExecutor::ReceiveStopSignal();
 }
-

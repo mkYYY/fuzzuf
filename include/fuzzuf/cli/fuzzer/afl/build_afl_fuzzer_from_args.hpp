@@ -213,7 +213,6 @@ std::unique_ptr<TFuzzer> BuildAFLFuzzerFromArgs(
                             setting->argv,
                             setting->exec_timelimit_ms,
                             setting->exec_memlimit,
-                            setting->forksrv,
                             setting->out_dir / GetDefaultOutfile<AFLTag>(),
                             GetMapSize<AFLTag>(), // afl_shm_size
                             0, // bb_shm_size

@@ -63,7 +63,8 @@ LinuxForkServerExecutor::LinuxForkServerExecutor(
     u32 afl_shm_size,
     u32  bb_shm_size,
     bool record_stdout_and_err,
-    std::vector< std::string > &&environment_variables_
+    std::vector< std::string > &&environment_variables_,
+    bool defer_forksrv
 ) :
     Executor( argv, exec_timelimit_ms, exec_memlimit, path_to_write_input.string() ),
     afl_edge_coverage(afl_shm_size),
@@ -82,7 +83,11 @@ LinuxForkServerExecutor::LinuxForkServerExecutor(
     SetupEnvironmentVariablesForTarget();
     CreateJoinedEnvironmentVariables( std::move( environment_variables_ ) );
 
-    put_channel.SetupForkServer((char* const*) cargv.data());
+    if (!defer_forksrv) {
+        put_channel.SetupForkServer((char* const*) cargv.data());
+    } else {
+        setenv("__AFL_DEFER_FORKSRV", "1", 1);
+    }
 }
 
 /**

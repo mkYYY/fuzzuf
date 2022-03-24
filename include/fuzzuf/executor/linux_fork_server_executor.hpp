@@ -67,7 +67,8 @@ public:
         // which fd should be recorded. For example, by passing std::vector<int>{1, 2} to this class,
         // we would tell that we would like to record stdout and stderr.
         bool record_stdout_and_err = false,
-	std::vector< std::string > &&environment_variables_ = {}
+        std::vector< std::string > &&environment_variables_ = {},
+        bool defer_forksrv = false
     );
     ~LinuxForkServerExecutor();
 
@@ -109,13 +110,14 @@ public:
     fuzzuf::executor::output_t MoveStdOut();
     // InplaceMemoryFeedback made of GetStdErr before calling this function becomes invalid after Run()
     fuzzuf::executor::output_t MoveStdErr();
-private:
+protected:
     /**
      * Take snapshot of environment variables.
      * This updates both environment_variables and raw_environment_variables.
      * @param extra Executor specific environment variables those are set only on the child process of this executor.
      */ 
     void CreateJoinedEnvironmentVariables( std::vector< std::string > &&extra );
+private:
     PUTExitReasonType last_exit_reason;
     u8 last_signal;    
     fuzzuf::executor::output_t stdout_buffer;
@@ -146,6 +148,7 @@ private:
      */
     std::vector< const char* > raw_environment_variables;
     
+protected:
     // ZeroMqChannel put_channel;
     FdChannel put_channel;
 };

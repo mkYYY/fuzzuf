@@ -27,6 +27,7 @@
 #include "fuzzuf/exceptions.hpp"
 #include "fuzzuf/executor/executor.hpp"
 #include "fuzzuf/executor/native_linux_executor.hpp"
+#include "fuzzuf/executor/linux_fork_server_executor.hpp"
 #include "fuzzuf/utils/common.hpp"
 #include "fuzzuf/coverage/afl_edge_cov_attacher.hpp"
 #include "fuzzuf/coverage/fuzzuf_bb_cov_attacher.hpp"
@@ -41,6 +42,40 @@
 // Responsibility (TODO):
 //  - The lifetime for the class itself and the time period of validity of member variables must match (TODO because checks have not completed)
 //      - This is to ensure the robustness
+
+#if 1
+class FridaLinuxExecutor : public LinuxForkServerExecutor {
+public:
+    FridaLinuxExecutor(
+        const std::vector<std::string> &argv,
+        u32 exec_timelimit_ms,
+        u64 exec_memlimit,
+        const fs::path &path_to_write_input,
+        u32 afl_shm_size,
+        u32  bb_shm_size,
+        const fs::path &proxy_path,
+        // FIXME: The below is a temporary flag to avoid a big performance issue.
+        // The issue appears when we save the outputs of stdout/stderr to buffers
+        // in every execution of a PUT, which isn't required in most fuzzers.
+        // This is just a temporary and ugly countermeasure.
+        // In the future, we should generalize this flag so that we can arbitrarily specify 
+        // which fd should be recorded. For example, by passing std::vector<int>{1, 2} to this class,
+        // we would tell that we would like to record stdout and stderr.
+        bool record_stdout_and_err = false,
+        std::vector< std::string > &&environment_variables_ = {}
+    );
+    ~FridaLinuxExecutor() override;
+
+    FridaLinuxExecutor( const FridaLinuxExecutor& ) = delete;
+    FridaLinuxExecutor( FridaLinuxExecutor&& ) = delete;
+    FridaLinuxExecutor &operator=( const FridaLinuxExecutor& ) = delete;
+    FridaLinuxExecutor &operator=( FridaLinuxExecutor&& ) = delete;
+    FridaLinuxExecutor() = delete;
+
+    void Run(const u8 *buf, u32 len, u32 timeout_ms=0) override;
+    void ReceiveStopSignal(void) override;
+};
+#else
 class FridaLinuxExecutor : public NativeLinuxExecutor {
 public:
     FridaLinuxExecutor(  
@@ -73,3 +108,4 @@ public:
     void Run(const u8 *buf, u32 len, u32 timeout_ms=0) override;
     void ReceiveStopSignal(void) override;
 };
+#endif
