@@ -32,7 +32,7 @@ struct AFLFastTestcase : public afl::AFLTestcase {
   AFLFastTestcase(std::shared_ptr<exec_input::OnDiskExecInput> input);
   ~AFLFastTestcase();
 
-  u64 n_fuzz; /* Number of fuzz, does not overflow */
+  u32 n_fuzz_entry; /* offset in n_fuzz */
 };
 
 }  // namespace fuzzuf::algorithm::aflfast
