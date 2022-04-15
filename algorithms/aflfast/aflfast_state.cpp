@@ -19,6 +19,8 @@
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/algorithms/afl/afl_macro.hpp"
+#include <memory>
+#include <cmath>
 
 namespace fuzzuf::algorithm::aflfast {
 
@@ -27,13 +29,19 @@ AFLFastState::AFLFastState(
     std::shared_ptr<const AFLFastSetting> setting,
     std::shared_ptr<executor::AFLExecutorInterface> executor,
     std::unique_ptr<optimizer::Optimizer<u32>>&& mutop_optimizer
-) : 
+) :
     AFLStateTemplate<AFLFastTestcase>(
         setting,
         executor,
         std::move(mutop_optimizer)
     ),
-    setting(setting) {}
+    setting(setting) 
+{
+    if (setting->schedule == option::FAST) {
+        //n_fuzz = std::make_shared<u32[]>(N_FUZZ_SIZE);
+        n_fuzz = new u32[N_FUZZ_SIZE];
+    }
+}
 
 std::shared_ptr<AFLFastTestcase> AFLFastState::AddToQueue(
     const std::string &fn,
@@ -42,7 +50,6 @@ std::shared_ptr<AFLFastTestcase> AFLFastState::AddToQueue(
     bool passed_det
 ) {
     std::shared_ptr<AFLFastTestcase> testcase = AFLStateTemplate<AFLFastTestcase>::AddToQueue(fn, buf, len, passed_det);
-    testcase->n_fuzz = 1;
 
     return testcase;
 }
@@ -52,7 +59,7 @@ void AFLFastState::UpdateBitmapScoreWithRawTrace(
     const u8 *trace_bits,
     u32 map_size
 ) {
-    u64 fuzz_p2 = fuzzuf::utils::NextP2(testcase.n_fuzz);
+    u64 fuzz_p2 = fuzzuf::utils::NextP2(n_fuzz[testcase.n_fuzz_entry]);
     u64 fav_factor = testcase.exec_us * testcase.input->GetLen();
 
     for (u32 i=0; i<map_size; i++) {
@@ -60,7 +67,7 @@ void AFLFastState::UpdateBitmapScoreWithRawTrace(
             if (top_rated[i]) {
                 auto &top_testcase = top_rated[i].value().get();
 
-                u64 top_rated_fuzz_p2 = fuzzuf::utils::NextP2(top_testcase.n_fuzz);
+                u64 top_rated_fuzz_p2 = fuzzuf::utils::NextP2(n_fuzz[top_testcase.n_fuzz_entry]);
                 u64 factor = top_testcase.exec_us * top_testcase.input->GetLen();
 
                 if (fuzz_p2 > top_rated_fuzz_p2) continue;
@@ -105,18 +112,25 @@ bool AFLFastState::SaveIfInteresting(
 ) {
     /* Update path frequency. */
     u32 cksum = inp_feed.CalcCksum32();
-    for (auto &testcase : case_queue) {
-        if (testcase->exec_cksum == cksum) {
-            testcase->n_fuzz += 1;
-        }
+
+    /* Saturated increment */
+    if (n_fuzz[cksum % N_FUZZ_SIZE] < 0xFFFFFFFF) {
+        n_fuzz[cksum % N_FUZZ_SIZE]++;
     }
 
-    return AFLStateTemplate<AFLFastTestcase>::SaveIfInteresting(
+    bool res = AFLStateTemplate<AFLFastTestcase>::SaveIfInteresting(
         buf,
         len,
         inp_feed,
         exit_status
     );
+
+    if (res && (exit_status.exit_reason == crash_mode)) {
+        case_queue.back()->n_fuzz_entry = cksum % N_FUZZ_SIZE;
+        n_fuzz[case_queue.back()->n_fuzz_entry] = 1;
+    }
+
+    return res;
 }
 
 u32 AFLFastState::DoCalcScore(AFLFastTestcase &testcase) {
@@ -179,11 +193,9 @@ u32 AFLFastState::DoCalcScore(AFLFastTestcase &testcase) {
         break;
     }
 
-    u64 fuzz = testcase.n_fuzz;
-    u64 fuzz_total;
-
     u32 n_paths, fuzz_mu;
-    u32 factor = 1;
+    double factor = 1.0;
+    u32 divisor;
 
     switch (setting->schedule) {
         case option::EXPLORE:
@@ -194,40 +206,66 @@ u32 AFLFastState::DoCalcScore(AFLFastTestcase &testcase) {
             break;
 
         case option::COE:
-            fuzz_total = 0;
+            // Don't modify perf_score for unfuzzed seeds
+            if (!testcase.fuzz_level) break;
+            fuzz_mu = 0.0;
             n_paths = 0;
 
-            for (const auto &testcase : case_queue) {
-                fuzz_total += testcase->n_fuzz;
+            for (const auto &tc: case_queue) {
+                fuzz_mu += std::log2(n_fuzz[tc->n_fuzz_entry]);
                 n_paths++;
             }
 
-            fuzz_mu = fuzz_total / n_paths;
-            if (fuzz <= fuzz_mu) {
-                if (testcase.fuzz_level < 16) {
-                    factor = ((u32) (1 << testcase.fuzz_level));
-                } else {
-                    factor = option::GetMaxFactor(*this);
-                }
-            } else {
-                factor = 0;
-            }
-            break;
+            fuzz_mu = fuzz_mu / n_paths;
 
-        case option::FAST:
-            if (testcase.fuzz_level < 16) {
-                factor = ((u32) (1 << testcase.fuzz_level)) / (fuzz == 0 ? 1 : fuzz);
-            } else {
-                factor = option::GetMaxFactor(*this) / (fuzz == 0 ? 1 : fuzzuf::utils::NextP2(fuzz));
+            if (std::log2(n_fuzz[testcase.n_fuzz_entry]) > fuzz_mu) {
+                if (!testcase.favored) factor = 0;
+                break;
             }
+
+        // Fall through
+        case option::FAST:
+            // Don't modify unfuzzed seeds
+            if (!testcase.fuzz_level) break;
+
+            switch(static_cast<u32>(std::log2(n_fuzz[testcase.n_fuzz_entry]))) {
+                // Using a GCC extension, case ranges (https://gcc.gnu.org/onlinedocs/gcc/Case-Ranges.html)
+                case 0 ... 1:
+                    factor = 4.0;
+                    break;
+                case 2 ... 3:
+                    factor = 3.0;
+                    break;
+                case 4:
+                    factor = 2.0;
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    if (!testcase.favored) factor = 0.8;
+                    break;
+                case 7:
+                    if (!testcase.favored) factor = 0.6;
+                    break;
+                default:
+                    if (!testcase.favored) factor = 0.4;
+                    break;
+            }
+
+            if (testcase.favored) factor *= 1.15;
             break;
 
         case option::LIN:
-            factor = testcase.fuzz_level / (fuzz == 0 ? 1 : fuzz);
+            // Avoid possible div by zero
+            divisor = n_fuzz[testcase.n_fuzz_entry];
+            if (divisor != 0xFFFFFFFF) divisor++;
+            factor = testcase.fuzz_level / divisor;
             break;
 
         case option::QUAD:
-            factor = testcase.fuzz_level * testcase.fuzz_level / (fuzz == 0 ? 1 : fuzz);
+            divisor = n_fuzz[testcase.n_fuzz_entry];
+            if (divisor != 0xFFFFFFFF) divisor++;
+            factor = testcase.fuzz_level * testcase.fuzz_level / divisor;
             break;
 
         default:

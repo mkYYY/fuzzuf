@@ -27,6 +27,8 @@
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_setting.hpp"
 
+#define N_FUZZ_SIZE (1 << 21)
+
 namespace fuzzuf::algorithm::aflfast {
 
 struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
@@ -61,6 +63,8 @@ struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
     void ShowStats(void);
 
     std::shared_ptr<const AFLFastSetting> setting;
+    //std::shared_ptr<u32[]> n_fuzz;
+    u32 *n_fuzz;
 };
 
 } // namespace fuzzuf::algorithm::aflfast

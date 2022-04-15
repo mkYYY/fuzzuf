@@ -21,9 +21,8 @@
 namespace fuzzuf::algorithm::aflfast {
 
 AFLFastTestcase::AFLFastTestcase(std::shared_ptr<OnDiskExecInput> input)
-    : AFLTestcase(input) {
-    n_fuzz = 0;
-}
+    : AFLTestcase(input),
+      n_fuzz_entry(0) {}
 
 AFLFastTestcase::~AFLFastTestcase() {}
 
