@@ -219,14 +219,13 @@ u32 AFLFastState::DoCalcScore(AFLFastTestcase &testcase) {
                 if (!testcase.favored) factor = 0;
                 break;
             }
+            [[fallthrough]];
 
-        // Fall through
         case option::FAST:
             // Don't modify unfuzzed seeds
             if (!testcase.fuzz_level) break;
 
             switch(static_cast<u32>(std::log2(n_fuzz[testcase.n_fuzz_entry]))) {
-                // Using a GCC extension, case ranges (https://gcc.gnu.org/onlinedocs/gcc/Case-Ranges.html)
                 case 0 ... 1:
                     factor = 4.0;
                     break;
