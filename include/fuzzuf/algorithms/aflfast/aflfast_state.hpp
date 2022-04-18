@@ -53,8 +53,7 @@ struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
   void ShowStats(void);
 
   std::shared_ptr<const AFLFastSetting> setting;
-  //std::shared_ptr<u32[]> n_fuzz;
-  u32 *n_fuzz;
+  std::shared_ptr<u32[]> n_fuzz;
 };
 
 }  // namespace fuzzuf::algorithm::aflfast
