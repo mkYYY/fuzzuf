@@ -37,9 +37,7 @@ AFLFastState::AFLFastState(
     ),
     setting(setting) 
 {
-    if (setting->schedule == option::FAST) {
-        n_fuzz.reset(new u32[N_FUZZ_SIZE]);
-    }
+    n_fuzz.reset(new u32[N_FUZZ_SIZE]);
 }
 
 std::shared_ptr<AFLFastTestcase> AFLFastState::AddToQueue(
