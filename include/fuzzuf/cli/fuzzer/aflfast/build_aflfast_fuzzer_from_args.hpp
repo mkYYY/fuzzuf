@@ -25,6 +25,7 @@
 #include "fuzzuf/utils/workspace.hpp"
 #include "fuzzuf/optimizer/optimizer.hpp"
 #include "fuzzuf/algorithms/afl/afl_havoc_case_distrib.hpp"
+#include "fuzzuf/algorithms/aflfast/aflfast_havoc.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_setting.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
@@ -219,7 +220,8 @@ std::unique_ptr<TFuzzer> BuildAFLFastFuzzerFromArgs(
     }
 
     auto mutop_optimizer = std::unique_ptr<optimizer::Optimizer<u32>>(
-                                new algorithm::afl::AFLHavocCaseDistrib()
+                                //new algorithm::afl::AFLHavocCaseDistrib()
+                                new algorithm::aflfast::havoc::AFLFastHavocCaseDistrib()
                            );
 
     // Create AFLFastState

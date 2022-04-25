@@ -285,6 +285,8 @@ set(
   algorithms/afl/afl_setting.cpp
   algorithms/afl/afl_testcase.cpp
   algorithms/afl/afl_util.cpp
+  algorithms/aflfast/aflfast_havoc.cpp
+  algorithms/aflfast/aflfast_mutation_hierarflow_routines.cpp
   algorithms/aflfast/aflfast_other_hierarflow_routines.cpp
   algorithms/aflfast/aflfast_setting.cpp
   algorithms/aflfast/aflfast_state.cpp
