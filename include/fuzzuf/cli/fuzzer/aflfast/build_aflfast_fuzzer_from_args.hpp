@@ -20,6 +20,7 @@
 #define FUZZUF_INCLUDE_CLI_FUZZER_AFLFAST_BUILD_AFLFAST_FROM_ARGS_HPP
 
 #include "fuzzuf/algorithms/afl/afl_havoc_case_distrib.hpp"
+#include "fuzzuf/algorithms/aflfast/aflfast_havoc.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_other_hierarflow_routines.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_setting.hpp"
