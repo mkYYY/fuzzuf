@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-#pragma once
+
+#ifndef FUZZUF_INCLUDE_ALGORITHM_AFL_AFL_MUTATION_HIERARFLOW_ROUTINES_HPP
+#define FUZZUF_INCLUDE_ALGORITHM_AFL_AFL_MUTATION_HIERARFLOW_ROUTINES_HPP
 
 #include <memory>
 #include "fuzzuf/exec_input/exec_input.hpp"
@@ -520,3 +522,5 @@ using Splicing = SplicingTemplate<AFLState>;
 } // namespace fuzzuf::algorithm::afl::routine::mutation
 
 #include "fuzzuf/algorithms/afl/templates/afl_mutation_hierarflow_routines.hpp"
+
+#endif
