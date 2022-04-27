@@ -53,10 +53,10 @@ static constexpr std::array<double, AFLPP_NUM_CASE> AFLFastGetCaseWeights(
     weights[INSERT_SAME_BYTE] = 1.0; // case 47
     weights[OVERWRITE_WITH_CHUNK]= 3.0; // case 48 ... 50
     weights[OVERWRITE_WITH_SAME_BYTE] = 1.0; // case 51
-    weights[AFLPP_ADDBYTE] = 1.0; // case 52, AFLPP_ADDBYTE
-    weights[AFLPP_SUBBYTE] = 1.0; // case 53, AFLPP_SUBBYTE
+    weights[AFLPP_ADDBYTE] = 1.0; // case 52
+    weights[AFLPP_SUBBYTE] = 1.0; // case 53
     weights[FLIP8] = 1.0; // case 54
-    weights[AFLPP_SWITCH_BYTES] = 2.0; // case 55 ... 56, AFLPP_SWITCH_BYTES
+    weights[AFLPP_SWITCH_BYTES] = 2.0; // case 55 ... 56
     weights[DELETE_BYTES] = 8.0; // case 57 ... 64
 
     if (has_extras && has_a_extras) {
@@ -104,16 +104,7 @@ u32 AFLFastHavocCaseDistrib::CalcValue() {
 
     bool has_extras  = !extras.empty();
     bool has_aextras = !a_extras.empty();
-#if 0
-    return static_cast<HavocCase>(dists[has_extras][has_aextras]());
-#else
-    HavocCase hc = static_cast<HavocCase>(dists[has_extras][has_aextras]());
-    FILE *fp = fopen("/tmp/log.log", "a+");
-    fprintf(fp, "[+] %s: Chose HavocCase of %u / %u\n", __FUNCTION__, hc, AFLPP_NUM_CASE);
-    fclose(fp);
-    return hc;
-#endif
-
+    return static_cast<u32>(dists[has_extras][has_aextras]());
 }
 
 void AFLFastCustomCases(
@@ -123,9 +114,6 @@ void AFLFastCustomCases(
     [[maybe_unused]] const std::vector<afl::dictionary::AFLDictData>& extras,
     [[maybe_unused]] const std::vector<afl::dictionary::AFLDictData>& a_extras
 ) {
-    FILE *fp = fopen("/tmp/log.log", "a+");
-    fprintf(fp, "[*] %s: called with case_idx=%u\n", __FUNCTION__, case_idx);
-    fclose(fp);
     using afl::util::UR;
     switch(case_idx) {
     case AFLPP_ADDBYTE:
