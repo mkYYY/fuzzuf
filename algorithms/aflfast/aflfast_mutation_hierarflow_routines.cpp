@@ -1,13 +1,10 @@
+#include "fuzzuf/algorithms/aflfast/aflfast_mutation_hierarflow_routines.hpp"
 
-#include "fuzzuf/algorithms/afl/afl_mutation_hierarflow_routines.hpp"
-#include "fuzzuf/algorithms/afl/afl_mutator.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_testcase.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_havoc.hpp"
 
 namespace fuzzuf::algorithm::afl::routine::mutation {
 
-using AFLFastState = aflfast::AFLFastState;
 using AFLFastTestcase = aflfast::AFLFastTestcase;
 
 // explicit specialization

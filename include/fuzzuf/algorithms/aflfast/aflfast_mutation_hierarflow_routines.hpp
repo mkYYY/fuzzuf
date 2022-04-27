@@ -1,6 +1,6 @@
 /*
  * fuzzuf
- * Copyright (C) 2021 Ricerca Security
+ * Copyright (C) 2022 Ricerca Security
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,23 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-#pragma once
 
-#include <vector>
-#include <array>
-#include <memory>
-#include "fuzzuf/utils/common.hpp"
-#include "fuzzuf/fuzzer/fuzzer.hpp"
-#include "fuzzuf/algorithms/afl/afl_fuzzer.hpp"
+#ifndef FUZZUF_INCLUDE_ALGORITHM_AFLFAST_AFLFAST_MUTATION_HIERARFLOW_ROUTINES_HPP
+#define FUZZUF_INCLUDE_ALGORITHM_AFLFAST_AFLFAST_MUTATION_HIERARFLOW_ROUTINES_HPP
+
+#include "fuzzuf/algorithms/afl/afl_mutation_hierarflow_routines.hpp"
+#include "fuzzuf/algorithms/afl/afl_mutator.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_mutation_hierarflow_routines.hpp"
 
-#include "fuzzuf/hierarflow/hierarflow_routine.hpp"
-#include "fuzzuf/hierarflow/hierarflow_node.hpp"
-#include "fuzzuf/hierarflow/hierarflow_intermediates.hpp"
+namespace fuzzuf::algorithm::afl::routine::mutation {
 
-namespace fuzzuf::algorithm::aflfast {
+using AFLFastState = aflfast::AFLFastState;
 
-using AFLFastFuzzer = afl::AFLFuzzerTemplate<AFLFastState>;
+// explicit specialization
+template<>
+AFLMutCalleeRef<AFLFastState> HavocTemplate<AFLFastState>::operator()(
+    AFLMutatorTemplate<AFLFastState>& mutator
+);
 
-} // namespace fuzzuf::algorithm::aflfast
+} // namespace fuzzuf::algorithm::afl::routine::mutation
+
+#endif
