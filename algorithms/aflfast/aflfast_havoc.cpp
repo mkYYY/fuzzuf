@@ -114,21 +114,25 @@ void AFLFastCustomCases(
     [[maybe_unused]] const std::vector<afl::dictionary::AFLDictData>& extras,
     [[maybe_unused]] const std::vector<afl::dictionary::AFLDictData>& a_extras
 ) {
-    using afl::util::UR;
+    auto UR = [](u32 limit) {
+        return afl::util::UR(limit, -1);
+    };
     switch(case_idx) {
     case AFLPP_ADDBYTE:
-        outbuf[UR(len, -1)]++;
+        outbuf[UR(len)]++;
         break;
 
     case AFLPP_SUBBYTE:
-        outbuf[UR(len, -1)]--;
+        outbuf[UR(len)]--;
         break;
 
     case AFLPP_SWITCH_BYTES: {
+        if (len < 4) { break; }
+
         u32 to_end, switch_to, switch_len, switch_from;
-        switch_from = UR(len, -1);
+        switch_from = UR(len);
         do {
-            switch_to = UR(len, -1);
+            switch_to = UR(len);
         } while (switch_from == switch_to);
 
         if (switch_from < switch_to) {
@@ -139,10 +143,8 @@ void AFLFastCustomCases(
             to_end = len - switch_from;
         }
 
-        //switch_len = choose_block_len(afl, MIN(switch_len, to_end));
         switch_len = ChooseBlockLen(std::min(switch_len, to_end));
 
-        //u8 *new_buf = afl_realloc(AFL_BUF_PARAM(out_scratch), switch_len);
         std::unique_ptr<u8> new_buf(new u8[switch_len]);
 
         /* Backup */
