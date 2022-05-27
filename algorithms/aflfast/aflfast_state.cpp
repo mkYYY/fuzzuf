@@ -35,7 +35,9 @@ AFLFastState::AFLFastState(
         executor,
         std::move(mutop_optimizer)
     ),
-    setting(setting) 
+    setting(setting),
+    prev_queued_items(0),
+    alias_probability(nullptr)
 {
     n_fuzz.reset(new u32[N_FUZZ_SIZE]);
 }
