@@ -31,7 +31,9 @@ AFLFastState::AFLFastState(
     std::unique_ptr<optimizer::Optimizer<u32>> &&mutop_optimizer)
     : AFLStateTemplate<AFLFastTestcase>(setting, executor,
                                         std::move(mutop_optimizer)),
-      setting(setting) {}
+      setting(setting),
+      prev_queued_items(0),
+      alias_probability(nullptr) {}
 
 std::shared_ptr<AFLFastTestcase> AFLFastState::AddToQueue(const std::string &fn,
                                                           const u8 *buf,

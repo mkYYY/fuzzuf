@@ -26,8 +26,11 @@
 #include "fuzzuf/algorithms/aflfast/aflfast_setting.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_testcase.hpp"
 #include "fuzzuf/optimizer/optimizer.hpp"
+#include "fuzzuf/utils/random.hpp"
 
 namespace fuzzuf::algorithm::aflfast {
+
+using fuzzuf::utils::random::WalkerDiscreteDistribution;
 
 struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
   explicit AFLFastState(
@@ -51,6 +54,9 @@ struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
   void ShowStats(void);
 
   std::shared_ptr<const AFLFastSetting> setting;
+
+  u32 prev_queued_items;
+  std::unique_ptr<WalkerDiscreteDistribution<double>> alias_probability;
 };
 
 }  // namespace fuzzuf::algorithm::aflfast
