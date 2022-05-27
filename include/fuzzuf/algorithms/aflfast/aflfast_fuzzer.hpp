@@ -24,6 +24,7 @@
 #include "fuzzuf/fuzzer/fuzzer.hpp"
 #include "fuzzuf/algorithms/afl/afl_fuzzer.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
+#include "fuzzuf/algorithms/aflfast/aflfast_other_hierarflow_routines.hpp"
 
 #include "fuzzuf/hierarflow/hierarflow_routine.hpp"
 #include "fuzzuf/hierarflow/hierarflow_node.hpp"

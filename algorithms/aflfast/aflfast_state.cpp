@@ -17,6 +17,9 @@
  */
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 
+#include <cmath>
+#include <memory>
+
 #include "fuzzuf/algorithms/afl/afl_macro.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/utils/common.hpp"

@@ -37,5 +37,16 @@ template <>
 AFLMidCalleeRef<AFLFastState> AbandonEntryTemplate<AFLFastState>::operator()(
     std::shared_ptr<AFLFastTestcase> testcase);
 
+// explicit specialization
+template <>
+utils::NullableRef<hierarflow::HierarFlowCallee<void(void)>>
+SelectSeedTemplate<AFLFastState>::operator()(void);
+
+void CreateAliasTable(AFLFastState &state);
+
+double ComputeWeight(const AFLFastState &state, const AFLFastTestcase &testcase,
+                     const double &avg_exec_us, const double &avg_bitmap_size,
+                     const double &avg_top_size);
+
 }  // namespace fuzzuf::algorithm::afl::routine::other
 #endif
