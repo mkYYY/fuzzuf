@@ -1,7 +1,7 @@
 /*
  * fuzzuf
  * Copyright (C) 2021 Ricerca Security
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,11 +21,11 @@
 
 #include <memory>
 
-#include "fuzzuf/optimizer/optimizer.hpp"
 #include "fuzzuf/algorithms/afl/afl_state.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_testcase.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_setting.hpp"
+#include "fuzzuf/algorithms/aflfast/aflfast_testcase.hpp"
+#include "fuzzuf/optimizer/optimizer.hpp"
 #include "fuzzuf/utils/random.hpp"
 
 #define N_FUZZ_SIZE (1 << 21)
@@ -35,43 +35,33 @@ namespace fuzzuf::algorithm::aflfast {
 using fuzzuf::utils::random::WalkerDiscreteDistribution;
 
 struct AFLFastState : public afl::AFLStateTemplate<AFLFastTestcase> {
-    explicit AFLFastState(
-        std::shared_ptr<const AFLFastSetting> setting,
-        std::shared_ptr<executor::AFLExecutorInterface> executor,
-        std::unique_ptr<optimizer::Optimizer<u32>>&& mutop_optimizer
-    );
+  explicit AFLFastState(
+      std::shared_ptr<const AFLFastSetting> setting,
+      std::shared_ptr<executor::AFLExecutorInterface> executor,
+      std::unique_ptr<optimizer::Optimizer<u32>> &&mutop_optimizer);
 
-    std::shared_ptr<AFLFastTestcase> AddToQueue(
-        const std::string &fn,
-        const u8 *buf,
-        u32 len,
-        bool passed_det
-    );
+  std::shared_ptr<AFLFastTestcase> AddToQueue(const std::string &fn,
+                                              const u8 *buf, u32 len,
+                                              bool passed_det);
 
-    void UpdateBitmapScoreWithRawTrace(
-        AFLFastTestcase &testcase,
-        const u8 *trace_bits,
-        u32 map_size
-    );
+  void UpdateBitmapScoreWithRawTrace(AFLFastTestcase &testcase,
+                                     const u8 *trace_bits, u32 map_size);
 
-    bool SaveIfInteresting(
-        const u8 *buf,
-        u32 len,
-        InplaceMemoryFeedback &inp_feed,
-        ExitStatusFeedback &exit_status
-    );
+  bool SaveIfInteresting(const u8 *buf, u32 len,
+                         InplaceMemoryFeedback &inp_feed,
+                         ExitStatusFeedback &exit_status);
 
-    u32 DoCalcScore(AFLFastTestcase &testcase);
+  u32 DoCalcScore(AFLFastTestcase &testcase);
 
-    void ShowStats(void);
+  void ShowStats(void);
 
-    std::shared_ptr<const AFLFastSetting> setting;
-    std::shared_ptr<u32[]> n_fuzz;
+  std::shared_ptr<const AFLFastSetting> setting;
+  std::shared_ptr<u32[]> n_fuzz;
 
-    u32 prev_queued_items;
-    std::unique_ptr<WalkerDiscreteDistribution<double>> alias_probability;
+  u32 prev_queued_items;
+  std::unique_ptr<WalkerDiscreteDistribution<double>> alias_probability;
 };
 
-} // namespace fuzzuf::algorithm::aflfast
+}  // namespace fuzzuf::algorithm::aflfast
 
 #endif
