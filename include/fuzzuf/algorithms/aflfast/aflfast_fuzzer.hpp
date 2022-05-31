@@ -1,7 +1,7 @@
 /*
  * fuzzuf
  * Copyright (C) 2021 Ricerca Security
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,22 +17,22 @@
  */
 #pragma once
 
-#include <vector>
 #include <array>
 #include <memory>
-#include "fuzzuf/utils/common.hpp"
-#include "fuzzuf/fuzzer/fuzzer.hpp"
+#include <vector>
+
 #include "fuzzuf/algorithms/afl/afl_fuzzer.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_mutation_hierarflow_routines.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_other_hierarflow_routines.hpp"
-
-#include "fuzzuf/hierarflow/hierarflow_routine.hpp"
-#include "fuzzuf/hierarflow/hierarflow_node.hpp"
+#include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
+#include "fuzzuf/fuzzer/fuzzer.hpp"
 #include "fuzzuf/hierarflow/hierarflow_intermediates.hpp"
+#include "fuzzuf/hierarflow/hierarflow_node.hpp"
+#include "fuzzuf/hierarflow/hierarflow_routine.hpp"
+#include "fuzzuf/utils/common.hpp"
 
 namespace fuzzuf::algorithm::aflfast {
 
 using AFLFastFuzzer = afl::AFLFuzzerTemplate<AFLFastState>;
 
-} // namespace fuzzuf::algorithm::aflfast
+}  // namespace fuzzuf::algorithm::aflfast

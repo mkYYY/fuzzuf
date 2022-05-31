@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
+#include "fuzzuf/algorithms/aflfast/aflfast_other_hierarflow_routines.hpp"
+
 #include <memory>
 #include <numeric>
-#include "fuzzuf/algorithms/aflfast/aflfast_other_hierarflow_routines.hpp"
+
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_testcase.hpp"
 #include "fuzzuf/utils/random.hpp"
@@ -59,10 +61,10 @@ AFLMidCalleeRef<AFLFastState> ApplyDetMutsTemplate<AFLFastState>::operator()(
   /* Skip deterministic fuzzing if exec path checksum puts this out of scope
      for this master instance. */
 
-    if (state.orig_perf == 0 && state.queued_paths > 10) {
-        this->SetResponseValue(true);
-        return abandon_entry;
-    }
+  if (state.orig_perf == 0 && state.queued_paths > 10) {
+    this->SetResponseValue(true);
+    return abandon_entry;
+  }
 
   state.doing_det = true;
 
@@ -192,11 +194,11 @@ void CreateAliasTable(AFLFastState &state) {
   avg_top_size /= queued_items;
 
   std::vector<double> vw;
-  std::transform(
-      state.case_queue.begin(), state.case_queue.end(), std::back_inserter(vw),
-      [&](auto &tc) {
-        return ComputeWeight(state, *tc, avg_exec_us, avg_bitmap_size, avg_top_size);
-      });
+  std::transform(state.case_queue.begin(), state.case_queue.end(),
+                 std::back_inserter(vw), [&](auto &tc) {
+                   return ComputeWeight(state, *tc, avg_exec_us,
+                                        avg_bitmap_size, avg_top_size);
+                 });
 
   using fuzzuf::utils::random::WalkerDiscreteDistribution;
   state.alias_probability.reset(new WalkerDiscreteDistribution<double>(vw));
