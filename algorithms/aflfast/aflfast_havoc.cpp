@@ -14,7 +14,7 @@
 namespace fuzzuf::algorithm::aflfast::havoc {
 
 enum AFLFastExtraHavocCase : u32 {
-    AFLPP_ADDBYTE = NUM_CASE,
+    AFLPP_ADDBYTE = mutator::NUM_CASE,
     AFLPP_SUBBYTE,
     AFLPP_SWITCH_BYTES,
     AFLPP_NUM_CASE  // number of cases in AFL++ havoc
@@ -32,44 +32,44 @@ static constexpr std::array<double, AFLPP_NUM_CASE> AFLFastGetCaseWeights(
 ) {
     std::array<double, AFLPP_NUM_CASE> weights {};
 
-    weights[FLIP1] = 4.0; // case 0 ... 3
-    weights[INT8] = 4.0; // case 4 ... 7
-    weights[INT16_LE] = 2.0; // case 8 ... 9
-    weights[INT16_BE] = 2.0; // case 10 ... 11
-    weights[INT32_LE] = 2.0; // case 12 ... 13
-    weights[INT32_BE] = 2.0; // case 14 ... 15
-    weights[SUB8] = 4.0; // case 16 ... 19
-    weights[ADD8] = 4.0; // case 20 ... 23
-    weights[SUB16_LE] = 2.0; // case 24 ... 25
-    weights[SUB16_BE] = 2.0; // case 26 ... 27
-    weights[ADD16_LE] = 2.0; // case 28 ... 29
-    weights[ADD16_BE] = 2.0; // case 30 ... 31
-    weights[SUB32_LE] = 2.0; // case 32 ... 33
-    weights[SUB32_BE] = 2.0; // case 34 ... 35
-    weights[ADD32_LE] = 2.0; // case 36 ... 37
-    weights[ADD32_BE] = 2.0; // case 38 ... 39
-    weights[XOR] = 4.0; // case 40 ... 43
-    weights[CLONE_BYTES] = 3.0; // case 44 ... 46
-    weights[INSERT_SAME_BYTE] = 1.0; // case 47
-    weights[OVERWRITE_WITH_CHUNK]= 3.0; // case 48 ... 50
-    weights[OVERWRITE_WITH_SAME_BYTE] = 1.0; // case 51
+    weights[mutator::FLIP1] = 4.0; // case 0 ... 3
+    weights[mutator::INT8] = 4.0; // case 4 ... 7
+    weights[mutator::INT16_LE] = 2.0; // case 8 ... 9
+    weights[mutator::INT16_BE] = 2.0; // case 10 ... 11
+    weights[mutator::INT32_LE] = 2.0; // case 12 ... 13
+    weights[mutator::INT32_BE] = 2.0; // case 14 ... 15
+    weights[mutator::SUB8] = 4.0; // case 16 ... 19
+    weights[mutator::ADD8] = 4.0; // case 20 ... 23
+    weights[mutator::SUB16_LE] = 2.0; // case 24 ... 25
+    weights[mutator::SUB16_BE] = 2.0; // case 26 ... 27
+    weights[mutator::ADD16_LE] = 2.0; // case 28 ... 29
+    weights[mutator::ADD16_BE] = 2.0; // case 30 ... 31
+    weights[mutator::SUB32_LE] = 2.0; // case 32 ... 33
+    weights[mutator::SUB32_BE] = 2.0; // case 34 ... 35
+    weights[mutator::ADD32_LE] = 2.0; // case 36 ... 37
+    weights[mutator::ADD32_BE] = 2.0; // case 38 ... 39
+    weights[mutator::XOR] = 4.0; // case 40 ... 43
+    weights[mutator::CLONE_BYTES] = 3.0; // case 44 ... 46
+    weights[mutator::INSERT_SAME_BYTE] = 1.0; // case 47
+    weights[mutator::OVERWRITE_WITH_CHUNK]= 3.0; // case 48 ... 50
+    weights[mutator::OVERWRITE_WITH_SAME_BYTE] = 1.0; // case 51
     weights[AFLPP_ADDBYTE] = 1.0; // case 52
     weights[AFLPP_SUBBYTE] = 1.0; // case 53
-    weights[FLIP8] = 1.0; // case 54
+    weights[mutator::FLIP8] = 1.0; // case 54
     weights[AFLPP_SWITCH_BYTES] = 2.0; // case 55 ... 56
-    weights[DELETE_BYTES] = 8.0; // case 57 ... 64
+    weights[mutator::DELETE_BYTES] = 8.0; // case 57 ... 64
 
     if (has_extras && has_a_extras) {
-        weights[INSERT_EXTRA]          = 1.0;
-        weights[OVERWRITE_WITH_EXTRA]  = 1.0;
-        weights[INSERT_AEXTRA]         = 1.0;
-        weights[OVERWRITE_WITH_AEXTRA] = 1.0;
+        weights[mutator::INSERT_EXTRA]          = 1.0;
+        weights[mutator::OVERWRITE_WITH_EXTRA]  = 1.0;
+        weights[mutator::INSERT_AEXTRA]         = 1.0;
+        weights[mutator::OVERWRITE_WITH_AEXTRA] = 1.0;
     } else if (has_extras) {
-        weights[INSERT_EXTRA]          = 2.0;
-        weights[OVERWRITE_WITH_EXTRA]  = 2.0;
+        weights[mutator::INSERT_EXTRA]          = 2.0;
+        weights[mutator::OVERWRITE_WITH_EXTRA]  = 2.0;
     } else if (has_a_extras) {
-        weights[INSERT_AEXTRA]         = 2.0;
-        weights[OVERWRITE_WITH_AEXTRA] = 2.0;
+        weights[mutator::INSERT_AEXTRA]         = 2.0;
+        weights[mutator::OVERWRITE_WITH_AEXTRA] = 2.0;
     }
 
     return weights;
