@@ -32,6 +32,7 @@
 #include "fuzzuf/executor/native_linux_executor.hpp"
 #include "fuzzuf/executor/qemu_executor.hpp"
 #include "fuzzuf/optimizer/optimizer.hpp"
+#include "fuzzuf/utils/common.hpp"
 #include "fuzzuf/utils/optparser.hpp"
 #include "fuzzuf/utils/workspace.hpp"
 #ifdef __aarch64__
@@ -153,7 +154,7 @@ std::unique_ptr<TFuzzer> BuildAFLFastFuzzerFromArgs(
       global_options.exec_timelimit_ms.value_or(GetExecTimeout<AFLFastTag>()),
       mem_limit, aflfast_options.forksrv,
       /* dumb_mode */ false,  // FIXME: add dumb_mode
-      fuzzuf::utils::CPUID_BIND_WHICHEVER, FAST);
+      fuzzuf::utils::CPUID_DO_NOT_BIND, FAST);
 
   // NativeLinuxExecutor needs the directory specified by "out_dir" to be
   // already set up so we need to create the directory first, and then
