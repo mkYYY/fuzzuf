@@ -181,7 +181,7 @@ struct AFLStateTemplate {
 
   u32 stats_update_freq = 1; /* Stats update frequency (execs)   */
 
-  bool skip_deterministic = false;  /* Skip deterministic stages?       */
+  bool skip_deterministic = true;  /* Skip deterministic stages?       */
   bool force_deterministic = false; /* Force deterministic stages?      */
   bool use_splicing = false;        /* Recombine input files?           */
   bool score_changed = false;       /* Scoring for favorites changed?   */
@@ -253,6 +253,8 @@ struct AFLStateTemplate {
   u64 last_path_time = 0;    /* Time for most recent path (ms)   */
   u64 last_crash_time = 0;   /* Time for most recent crash (ms)  */
   u64 last_hang_time = 0;    /* Time for most recent hang (ms)   */
+  u64 last_record_time = 0;
+  bool csv_first = true;
   u64 last_crash_execs = 0;  /* Exec counter at last crash       */
   u64 queue_cycle = 0;       /* Queue round counter              */
   u64 cycles_wo_finds = 0;   /* Cycles without any new paths     */
