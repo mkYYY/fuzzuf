@@ -298,6 +298,20 @@ void AFLFastState::ShowStats(void) {
   /* If not enough time has passed since last UI update, bail out. */
   if (cur_ms - last_ms < 1000 / GetUiTargetHz(*this)) return;
 
+  FILE *fp = nullptr;
+  bool should_record = false;
+  if (cur_ms - last_record_time > 10*1000) {
+      last_record_time = cur_ms;
+      should_record = true;
+      fp = fopen("/tmp/log.log", "a+");
+      if (csv_first) {
+          csv_first = false;
+          fprintf(fp, "time,new_edges,total_execs");
+      }
+      fprintf(fp, "\n");
+      fprintf(fp, "%llu,", (cur_ms - start_time) / 1000);
+  }
+
   /* Check if we're past the 10 minute mark. */
   if (cur_ms - start_time > 10 * 60 * 1000) run_over10m = true;
 
@@ -545,9 +559,15 @@ void AFLFastState::ShowStats(void) {
 
   MSG("  new edges on : " cRST "%-22s " bSTG bV "\n", tmp.c_str());
 
+  if (should_record && fp)
+      fprintf(fp, "%u,", queued_with_cov);
+
   tmp = DescribeInteger(total_crashes) + " (" + DescribeInteger(unique_crashes);
   if (unique_crashes >= GetKeepUniqueCrash(*this)) tmp += '+';
   tmp += " unique)";
+
+  if (should_record && fp)
+      fprintf(fp, "%llu", total_execs);
 
   if (crash_mode != feedback::PUTExitReasonType::FAULT_NONE) {
     MSG(bV bSTOP " total execs : " cRST "%-21s " bSTG bV bSTOP
@@ -724,6 +744,10 @@ void AFLFastState::ShowStats(void) {
   /* Hallelujah! */
 
   fflush(0);
+
+  if (should_record && fp)
+      fclose(fp);
+  should_record = false;
 }
 
 }  // namespace fuzzuf::algorithm::aflfast
