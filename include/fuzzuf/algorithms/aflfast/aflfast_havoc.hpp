@@ -15,23 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-#pragma once
 
-#include <vector>
-#include <array>
-#include <memory>
-#include "fuzzuf/utils/common.hpp"
-#include "fuzzuf/fuzzer/fuzzer.hpp"
-#include "fuzzuf/algorithms/afl/afl_fuzzer.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
-#include "fuzzuf/algorithms/aflfast/aflfast_mutation_hierarflow_routines.hpp"
+#ifndef FUZZUF_INCLUDE_ALGORITHM_AFLFAST_AFLFAST_HAVOC_HPP
+#define FUZZUF_INCLUDE_ALGORITHM_AFLFAST_AFLFAST_HAVOC_HPP
 
-#include "fuzzuf/hierarflow/hierarflow_routine.hpp"
-#include "fuzzuf/hierarflow/hierarflow_node.hpp"
-#include "fuzzuf/hierarflow/hierarflow_intermediates.hpp"
+#include "fuzzuf/algorithms/afl/afl_dict_data.hpp"
+#include "fuzzuf/optimizer/optimizer.hpp"
 
-namespace fuzzuf::algorithm::aflfast {
+namespace fuzzuf::algorithm::aflfast::havoc {
 
-using AFLFastFuzzer = afl::AFLFuzzerTemplate<AFLFastState>;
+void AFLFastCustomCases(
+    u32 case_idx,
+    u8*& outbuf,
+    u32& len,
+    const std::vector<afl::dictionary::AFLDictData>& extras,
+    const std::vector<afl::dictionary::AFLDictData>& a_extras
+);
 
-} // namespace fuzzuf::algorithm::aflfast
+class AFLFastHavocCaseDistrib : public optimizer::Optimizer<u32> {
+public:
+    AFLFastHavocCaseDistrib();
+    ~AFLFastHavocCaseDistrib();
+    u32 CalcValue() override;
+};
+
+u32 ChooseBlockLen(u32 limit);
+
+} // namespace fuzzuf::algorithm::aflfast::havoc
+
+#endif
