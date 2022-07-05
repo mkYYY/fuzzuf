@@ -210,7 +210,7 @@ double ComputeWeight([[maybe_unused]] const AFLFastState &state,
                      const double &avg_top_size) {
   double weight = 1.0;
 
-  u32 hits = testcase.n_fuzz;
+  u32 hits = state.n_fuzz[testcase.n_fuzz_entry];
   if (likely(hits)) {
     weight *= std::log10(hits) + 1;
   }
