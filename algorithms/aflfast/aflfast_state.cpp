@@ -18,6 +18,7 @@
 #include "fuzzuf/algorithms/aflfast/aflfast_state.hpp"
 
 #include <cmath>
+#include <memory>
 
 #include "fuzzuf/algorithms/afl/afl_macro.hpp"
 #include "fuzzuf/algorithms/aflfast/aflfast_option.hpp"
@@ -33,7 +34,9 @@ AFLFastState::AFLFastState(
     std::unique_ptr<optimizer::Optimizer<u32>> &&mutop_optimizer)
     : AFLStateTemplate<AFLFastTestcase>(setting, executor,
                                         std::move(mutop_optimizer)),
-      setting(setting) {
+      setting(setting),
+      prev_queued_items(0),
+      alias_probability(nullptr) {
   n_fuzz.reset(new u32[N_FUZZ_SIZE]);
 }
 
